@@ -65,7 +65,7 @@ sudo env PATH=$PATH make flash
 
 
 
-# Debuging with openocd and arm-none-eabid-gdb [resource](https://esplatforms.blogspot.com/2014/07/armarm-toolchain-openpocd-lm4flash.html)
+# Debuging with [openocd](https://openocd.org/)  and arm-none-eabid-gdb [resource](https://esplatforms.blogspot.com/2014/07/armarm-toolchain-openpocd-lm4flash.html)
 
 ## Install openocd 
 ```
@@ -129,3 +129,22 @@ make[3]: Leaving directory '/home/abdullah/tiva-projects/openocd'
 make[2]: Leaving directory '/home/abdullah/tiva-projects/openocd'
 make[1]: Leaving directory '/home/abdullah/tiva-projects/openocd'
 ```
+
+## Debug with openocd
+
+we need to run openocd with the configuration file that matches our board
+```
+cd /usr/local/share/openocd/scripts/board
+openocd -f ek-tm4c123gxl.cfg
+```
+openocd will open a debug port 3333 in order to connect `arm-none-eabi-gdb` on it
+```
+cd "to your project binary file"
+arm-none-eabi-gdb "binary_file.axf or .ulf"
+tar ext :3333  #connect gdb to openocd on port 3333
+monnitor reset halt # reset the processor
+load #load the binary file
+c # continue into the file 
+```
+ctl C to terminate  the continu section (exiting while(1) loop) 
+
