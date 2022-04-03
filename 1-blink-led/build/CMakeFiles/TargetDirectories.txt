@@ -1,0 +1,4 @@
+/home/abdullah/tiva-projects/real-time-kernel/1-blink-led/build/CMakeFiles/rebuild_cache.dir
+/home/abdullah/tiva-projects/real-time-kernel/1-blink-led/build/CMakeFiles/edit_cache.dir
+/home/abdullah/tiva-projects/real-time-kernel/1-blink-led/build/CMakeFiles/blink_led.axf.dir
+/home/abdullah/tiva-projects/real-time-kernel/1-blink-led/build/CMakeFiles/flash.dir
