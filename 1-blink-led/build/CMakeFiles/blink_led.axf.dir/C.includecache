@@ -6,11 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/abdullah/tiva-projects/real-time-kernel/1-blink-led/inc/tm4c123gh6pm.h
-
 /home/abdullah/tiva-projects/real-time-kernel/1-blink-led/src/blink_led.c
-../inc/tm4c123gh6pm.h
-/home/abdullah/tiva-projects/real-time-kernel/1-blink-led/inc/tm4c123gh6pm.h
 stdint.h
 -
+tm4c123gh6pm.h
+/home/abdullah/tiva-projects/real-time-kernel/1-blink-led/src/tm4c123gh6pm.h
 

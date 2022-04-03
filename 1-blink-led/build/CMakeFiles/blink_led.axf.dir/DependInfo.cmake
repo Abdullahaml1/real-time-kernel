@@ -18,7 +18,7 @@ set(CMAKE_TARGET_DEFINITIONS_C
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
-  "/home/abdullah/tiva-projects/tivaware"
+  "/home/abdullah/tiva-projects/tivaware"/inc""
   )
 
 # Targets to which this target links.
