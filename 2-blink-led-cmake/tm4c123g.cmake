@@ -22,7 +22,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb ${CPU} ${FPU} -g -Os -ffunction-
 
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
-set(CMAKE_EXE_LINKER_FLAGS "-T${PROJECT_SOURCE_DIR}/tm4c123g.ld -specs=${PROJECT_SOURCE_DIR}/tiva.specs")
+set(MAP_FILE "-Wl,-Map=${CMAKE_PROJECT_NAME}.map") # map file flag https://stackoverflow.com/questions/48018825/how-do-i-get-a-map-file-within-arm-none-eabi-gcc
+set(CMAKE_EXE_LINKER_FLAGS "-T${PROJECT_SOURCE_DIR}/tm4c123g.ld -specs=${PROJECT_SOURCE_DIR}/tiva.specs ${MAP_FILE}")
 
 # Processor specific definitions
 add_definitions(-DPART_TM4C123GH6PM)

@@ -16,7 +16,7 @@ int main(void)
   SYSCTL_RCGCGPIO_R = 0x20U; // enable prortF clock gating
   GPIO_PORTF_DIR_R  = 0x0EU; // direction to output
   GPIO_PORTF_DEN_R  = 0x0EU;
-  GPIO_PORTF_DATA_R  = 0x04U; // write led
+  GPIO_PORTF_DATA_R  = 0x08U; // write led
 
   while(1)
     {

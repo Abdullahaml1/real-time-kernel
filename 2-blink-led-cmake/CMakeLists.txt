@@ -13,9 +13,9 @@ include_directories(inc/)
 
 #Source files
 file(GLOB SOURCES "src/*.c")
-add_executable(${CMAKE_PROJECT_NAME}.axf ${SOURCES})
+add_executable(${CMAKE_PROJECT_NAME}.elf ${SOURCES})
 
-target_link_libraries(${CMAKE_PROJECT_NAME}.axf 
+target_link_libraries(${CMAKE_PROJECT_NAME}.elf 
     ${TIVAWARE_PATH}/usblib/gcc/libusb.a
     ${TIVAWARE_PATH}/driverlib/gcc/libdriver.a
 )
