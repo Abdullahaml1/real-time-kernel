@@ -130,7 +130,7 @@ make[2]: Leaving directory '/home/abdullah/tiva-projects/openocd'
 make[1]: Leaving directory '/home/abdullah/tiva-projects/openocd'
 ```
 
-## Debug with openocd
+## Debug with openocd [video](https://www.youtube.com/watch?v=0bOdi7IAZeo)
 
 we need to run openocd with the configuration file that matches our board
 ```
@@ -219,3 +219,65 @@ output:
 (58) fpscr (/32): 0x00000000
 ===== Cortex-M DWT registers
 ```
+
+
+
+# Debuging FreeRTOS [describing the bug](https://embdev.net/topic/linker-error-undefined-reference-to-_sbrk)
+
+
+```
+Linker error, undefined reference to `_sbrk'
+```
+## 1-add those flog to c-flags: arm-none-eabi-gcc [resource](https://github.com/rust-embedded/cortex-m-rt/issues/259)
+
+```
+-specs=nano.specs -specs=nosys.specs
+```
+
+## 2-Modifying the `.ld` file
+Error: 
+```
+Linker error, undefined reference to `_sbrk'
+
+```
+
+Modify the `.ld` file to add `end=.` section
+
+```
+MEMORY
+{
+    FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 0x00040000
+    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
+}
+
+SECTIONS
+{
+    .text :
+    {
+        _text = .;
+        KEEP(*(.isr_vector))
+        *(.text*)
+        *(.rodata*)
+        _etext = .;
+    } > FLASH
+
+    .data : AT(ADDR(.text) + SIZEOF(.text))
+    {
+        _data = .;
+        *(vtable)
+        *(.data*)
+        _edata = .;
+    } > SRAM
+
+    .bss :
+    {
+        _bss = .;
+        *(.bss*)
+        *(COMMON)
+        _ebss = .;
+        end = .; /*this solved the problem*/
+    } > SRAM
+}
+
+```
+
