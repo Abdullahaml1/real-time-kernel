@@ -32,7 +32,9 @@
 
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "tm4c123gh6pm.h"
+#include "driverlib/interrupt.h" // rom tivawoare
 
 
 /* FreeRTOS includes. */
@@ -63,6 +65,15 @@ int main( void )
   GPIO_PORTF_DIR_R  = 0x0EU; // direction to output
   GPIO_PORTF_DEN_R  = 0x0EU;
   GPIO_PORTF_DATA_R  = 0x08U; // write led
+
+  // Enable interrupts to the processor.
+  IntMasterEnable();
+
+   // Enable the SysTick Interrupt.
+   SysTickIntEnable();
+
+   // Enable SysTick.
+   SysTickEnable();
 
 
 
@@ -97,7 +108,7 @@ volatile unsigned long u2;
 	for( ;; )
 	{
 
-    GPIO_PORTF_DATA_R  = 0x04U; // write led
+    GPIO_PORTF_DATA_R  = 0x04U; // blue led
 
 		/* Print out the name of this task. */
 		/* vPrintString( pcTaskName ); */
@@ -127,7 +138,7 @@ volatile unsigned long u22;
 	for( ;; )
 	{
 
-    GPIO_PORTF_DATA_R  = 0x08U; // write led
+    GPIO_PORTF_DATA_R  = 0x08U; // green led
 
 		/* Print out the name of this task. */
 		/* vPrintString( pcTaskName ); */

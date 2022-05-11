@@ -23,8 +23,8 @@
 //*****************************************************************************
 
 #include <stdint.h>
-#include "hw_nvic.h" // locations: ../../../tivaware/inc/
-#include "hw_types.h" // location: ../../../tivaware/inc/
+#include "inc/hw_nvic.h" // locations: ../../../tivaware/inc/
+#include "inc/hw_types.h" // location: ../../../tivaware/inc/
 
 //*****************************************************************************
 //

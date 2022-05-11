@@ -12,7 +12,7 @@ set(FREERTOS_PATH "$ENV{HOME}/tiva-projects/FreeRTOS")
 
 #include directories of the project
 include_directories($
-  ${TIVAWARE_PATH}/inc
+  ${TIVAWARE_PATH}/
   inc/
   ${FREERTOS_PATH}/Source/include
   ${FREERTOS_PATH}/Source/portable/GCC/ARM_CM4F
