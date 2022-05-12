@@ -64,25 +64,29 @@ void InitConsole(void);
 
 /*-----------------------------------------------------------*/
 /* The tasks to be created. */
-static void vHandlerTask( void *pvParameters );
+static void vStartTimersTask(void *pvParameters);
+static void vHandlerTask0( void *pvParameters );
+static void vHandlerTask1( void *pvParameters );
 static void vPeriodicTask( void *pvParameters );
 
-/* The service routine for the interrupt.  This is the interrupt that the
-   task will be synchronized with. */
-void vSoftwareInterruptHandler( void );
 
 /*-----------------------------------------------------------*/
 
 /* Declare a variable of type xSemaphoreHandle.  This is used to reference the
    semaphore that is used to synchronize a task with an interrupt. */
-xSemaphoreHandle xBinarySemaphore;
+xSemaphoreHandle xBinarySemaphore0;
+xSemaphoreHandle xBinarySemaphore1;
 
-xTaskHandle xHandlerHandle;
+
+volatile static uint8_t counter0;
+volatile static uint8_t counter1;
 
 /*-----------------------------------------------------------*/
 
 int main( void )
 {
+  counter0 = 0;
+  counter1 = 0;
 
   //-----------------------------------------------------------------------
   // init portF leds
@@ -98,6 +102,8 @@ int main( void )
 
   // The Timer0 peripheral must be enabled for use.
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+  // The Timer1 peripheral must be enabled for use.
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER1);
 
   // Set up the serial console to use for displaying messages.  This is
   // just for this example program and is not needed for Systick operation.
@@ -105,10 +111,14 @@ int main( void )
 
   // Configure Timer0B as a 16-bit periodic timer.
   TimerConfigure(TIMER0_BASE, TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PERIODIC);
+  // Configure Timer1B as a 16-bit periodic timer.
+  TimerConfigure(TIMER1_BASE, TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PERIODIC);
 
 
   // Set the Timer0B load value to 1ms.
-  TimerLoadSet(TIMER0_BASE, TIMER_B, SYS_CLOCK/100);
+  TimerLoadSet(TIMER0_BASE, TIMER_B, 0xffffffff);
+  // Set the Timer1B load value to 1ms.
+  TimerLoadSet(TIMER1_BASE, TIMER_B, 0xffffffff);
 
   // Enable interrupts to the processor.
   IntMasterEnable();
@@ -121,10 +131,17 @@ int main( void )
 
   // Configure the Timer0B interrupt for timer timeout.
   TimerIntEnable(TIMER0_BASE, TIMER_TIMB_TIMEOUT);
+  // Configure the Timer1B interrupt for timer timeout.
+  TimerIntEnable(TIMER1_BASE, TIMER_TIMB_TIMEOUT);
 
   // Enable the Timer0B interrupt on the processor (NVIC).
   IntEnable(INT_TIMER0B);
+  // Enable the Timer1B interrupt on the processor (NVIC).
+  IntEnable(INT_TIMER1B);
 
+  // setting both timers of equal priorities
+  IntPrioritySet(INT_TIMER0B, 1);
+  IntPrioritySet(INT_TIMER1B, 1);
 
 
 
@@ -135,24 +152,20 @@ int main( void )
   UARTprintf("\n   >>>>>>>>>>>\n\n");
 
 
-   /* Before a semaphore is used it must be explicitly created.  In this example
-      a binary semaphore is created. */
-   vSemaphoreCreateBinary( xBinarySemaphore );
+   vSemaphoreCreateBinary( xBinarySemaphore0 );
+   vSemaphoreCreateBinary( xBinarySemaphore1 );
 
    /* Check the semaphore was created successfully. */
-   if( xBinarySemaphore != NULL )
+   if(( xBinarySemaphore0 != NULL ) && ( xBinarySemaphore1 != NULL ))
      {
+       xTaskCreate( vStartTimersTask, "StartTimers", 240, NULL, 3, NULL );
 
-       /* Create the 'handler' task.  This is the task that will be synchronized
-          with the interrupt.  The handler task is created with a high priority to
-          ensure it runs immediately after the interrupt exits.  In this case a
-          priority of 3 is chosen. */
-       xTaskCreate( vHandlerTask, "Handler", 240, NULL, 1, &xHandlerHandle );
+       // Timer0B Interrupt Handler
+       xTaskCreate( vHandlerTask0, "Handler0", 240, NULL, 2, NULL );
+       // Timer1B Interrupt Handler
+       xTaskCreate( vHandlerTask1, "Handler1", 240, NULL, 2, NULL );
 
-       /* Create the task that will periodically generate a software interrupt.
-          This is created with a priority below the handler task to ensure it will
-          get preempted each time the handler task exits the Blocked state. */
-       /* xTaskCreate( vPeriodicTask, "Periodic", 240, NULL, 3, NULL ); */
+       xTaskCreate( vPeriodicTask, "Periodic", 240, NULL, 1, NULL );
 
 
 
@@ -170,19 +183,35 @@ int main( void )
 
 
 /*-----------------------------------------------------------*/
-
-static void vHandlerTask( void *pvParameters )
+static void vStartTimersTask( void *pvParameters)
 {
-  /* As per most tasks, this task is implemented within an infinite loop.
 
-     Take the semaphore once to start with so the semaphore is empty before the
-     infinite loop is entered.  The semaphore was created before the scheduler
-     was started so before this task ran for the first time.*/
-  xSemaphoreTake( xBinarySemaphore, 0 );
-
+  //disable interrupt
+  IntMasterDisable();
 
   // Enable Timer0B.
   TimerEnable(TIMER0_BASE, TIMER_B);
+
+  // Enable Timer0B.
+  TimerEnable(TIMER1_BASE, TIMER_B);
+
+
+  //enable interrupt
+  IntMasterEnable();
+
+  // killing ourselves
+  vTaskDelete(NULL);
+}
+
+static void vHandlerTask0( void *pvParameters )
+{
+  /* As per most tasks, this task is implemented within an infinite loop.
+     Take the semaphore once to start with so the semaphore is empty before the
+     infinite loop is entered.  The semaphore was created before the scheduler
+     was started so before this task ran for the first time.*/
+  xSemaphoreTake( xBinarySemaphore0, 0 );
+
+
 
   for( ;; )
     {
@@ -190,33 +219,59 @@ static void vHandlerTask( void *pvParameters )
          indefinitely meaning this function call will only return once the
          semaphore has been successfully obtained - so there is no need to check
          the returned value. */
-      xSemaphoreTake( xBinarySemaphore, portMAX_DELAY );
+      xSemaphoreTake( xBinarySemaphore0, portMAX_DELAY );
 
       // our timer0b event
-      GPIO_PORTF_DATA_R  ^= 0x04U; // toggling blue led
+      GPIO_PORTF_DATA_R  = 0x04U; // toggling blue led
 
       /* To get here the event must have occurred.  Process the event (in this
          case we just print out a message). */
-      UARTprintf("Handler task - Processing event.\n");
+      UARTprintf("\nHand0\n");
     }
 }
 /*-----------------------------------------------------------*/
 
+static void vHandlerTask1( void *pvParameters )
+{
+  /* As per most tasks, this task is implemented within an infinite loop.
+
+     Take the semaphore once to start with so the semaphore is empty before the
+     infinite loop is entered.  The semaphore was created before the scheduler
+     was started so before this task ran for the first time.*/
+  xSemaphoreTake( xBinarySemaphore1, 0 );
+
+
+
+  for( ;; )
+    {
+      /* Use the semaphore to wait for the event.  The task blocks
+         indefinitely meaning this function call will only return once the
+         semaphore has been successfully obtained - so there is no need to check
+         the returned value. */
+      xSemaphoreTake( xBinarySemaphore1, portMAX_DELAY );
+
+      // our timer0b event
+      GPIO_PORTF_DATA_R  = 0x08U; // toggling blue led
+
+      /* To get here the event must have occurred.  Process the event (in this
+         case we just print out a message). */
+      UARTprintf("\nHand1\n");
+    }
+}
+
+/*-----------------------------------------------------------*/
 static void vPeriodicTask( void *pvParameters )
 {
   /* As per most tasks, this task is implemented within an infinite loop. */
 
-  // Enable Timer0B.
-  TimerEnable(TIMER0_BASE, TIMER_B);
 
-  vTaskPrioritySet( xHandlerHandle, 4);
   for( ;; )
     {
       /* This task is just used to 'simulate' an interrupt.  This is done by
          periodically generating a software interrupt. */
       vTaskDelay( 500 / portTICK_RATE_MS );
 
-      UARTprintf("We are in periodic Task\n");
+      UARTprintf("\nperiodic\n");
 
           }
 }
@@ -308,14 +363,19 @@ InitConsole(void)
 
 void Timer0BIntHandler(void)
 {
-  portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-
-  /* 'Give' the semaphore to unblock the task. */
-  xSemaphoreGiveFromISR( xBinarySemaphore, &xHigherPriorityTaskWoken );
-
+  counter0 ++;
 
   // Clear the timer interrupt flag.
   TimerIntClear(TIMER0_BASE, TIMER_TIMB_TIMEOUT);
+
+  if (counter0==0)
+    {
+  portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+  /* 'Give' the semaphore to unblock the task. */
+  xSemaphoreGiveFromISR( xBinarySemaphore0, &xHigherPriorityTaskWoken );
+
+
 
 
   /* Giving the semaphore may have unblocked a task - if it did and the
@@ -329,5 +389,40 @@ void Timer0BIntHandler(void)
      the Cortex M3 port layer for this purpose.  taskYIELD() must never be called
      from an ISR! */
   portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
+    }
+
+}
+
+/* Timer1b ISR Handler  */
+
+void Timer1BIntHandler(void)
+{
+  counter1 ++;
+
+  // Clear the timer interrupt flag.
+  TimerIntClear(TIMER1_BASE, TIMER_TIMB_TIMEOUT);
+
+  if (counter1==0)
+    {
+  portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+  /* 'Give' the semaphore to unblock the task. */
+  xSemaphoreGiveFromISR( xBinarySemaphore1, &xHigherPriorityTaskWoken );
+
+
+
+
+  /* Giving the semaphore may have unblocked a task - if it did and the
+     unblocked task has a priority equal to or above the currently executing
+     task then xHigherPriorityTaskWoken will have been set to pdTRUE and
+     portEND_SWITCHING_ISR() will force a context switch to the newly unblocked
+     higher priority task.
+
+     NOTE: The syntax for forcing a context switch within an ISR varies between
+     FreeRTOS ports.  The portEND_SWITCHING_ISR() macro is provided as part of
+     the Cortex M3 port layer for this purpose.  taskYIELD() must never be called
+     from an ISR! */
+  portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
+    }
 
 }
