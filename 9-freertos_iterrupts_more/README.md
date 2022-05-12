@@ -26,3 +26,34 @@ make
 ```
 
 The executable will be in `freertos_interrupts_more.elf`
+
+## PrintF Output
+```
+Starting Code ->
+   >>>>>>>>>>>
+
+
+periodic
+
+periodic
+
+Hand0
+
+Hand1
+
+periodic
+
+periodic
+
+Hand0
+
+Hand1
+
+periodic
+
+periodic
+
+Hand0
+
+Hand1
+```
