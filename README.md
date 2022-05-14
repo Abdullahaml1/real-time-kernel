@@ -2,6 +2,7 @@
 
 * Articles about building barmetal ARM Application `use it as guidd not as an exact method` [link](https://www.embedded.com/building-bare-metal-arm-systems-with-gnu-part-1-getting-started/)
 * Sample of the startup code and linker script [link](https://github.com/QuantumLeaps/modern-embedded-programming-course/tree/master/lesson-19)
+* Course web page [link](https://www.state-machine.com/video-course)
 
 
 
