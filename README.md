@@ -1,3 +1,10 @@
+# Basic Knowledge before we getstarted
+
+* Articles about building barmetal ARM Application `use it as guidd not as an exact method` [link](https://www.embedded.com/building-bare-metal-arm-systems-with-gnu-part-1-getting-started/)
+* Sample of the startup code and linker script [link](https://github.com/QuantumLeaps/modern-embedded-programming-course/tree/master/lesson-19)
+
+
+
 # Installing falshing and cross compilers for tm4123gh6pm
 
 * [step by step guide](https://www.hackster.io/tcss/upload-code-to-ti-tm4c123-using-linux-cmake-and-lm4tools-c33cec)
