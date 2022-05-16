@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8.2)
-project(interrupt_hello)
+project(MIROS_interrupt)
 
 #Toolchain file
 include(tm4c123g.cmake)
