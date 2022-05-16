@@ -48,7 +48,7 @@ extern int main(void);
 // Reserve space for the system stack.
 //
 //*****************************************************************************
-static uint32_t pui32Stack[64]; // stack size is 64 word !
+static uint32_t pui32Stack[128]; // stack size is 128 word !
 
 
 //*****************************************************************************
