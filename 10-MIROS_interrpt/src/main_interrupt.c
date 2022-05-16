@@ -3,19 +3,23 @@
 
 
 void blinkGreen() {
-  bsp_LedGreenOn();
-  bsp_delay(100);
-  bsp_LedsOffAll();
-  bsp_delay(100);
+  while (1){
+    bsp_LedGreenOn();
+    bsp_delay(100);
+    bsp_LedsOffAll();
+    bsp_delay(100);
+  }
 }
 
 
 
 void blinkBlue() {
-  bsp_LedBlueOn();
-  bsp_delay(100);
-  bsp_LedsOffAll();
-  bsp_delay(100);
+  while(1){
+    bsp_LedBlueOn();
+    bsp_delay(100);
+    bsp_LedsOffAll();
+    bsp_delay(100);
+  }
 }
 
 
@@ -27,7 +31,7 @@ int main(void)
   while(1)
     {
       blinkBlue();
-      blinkBlue();
+      blinkGreen();
 
      }
   return 0;
