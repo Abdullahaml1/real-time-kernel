@@ -6,6 +6,8 @@
 #include "tm4c123gh6pm.h"
 #include "driverlib/interrupt.h" // include form tivaware
 
+#include "miros.h"
+
 
 
 // systick counter
@@ -76,6 +78,7 @@ void bsp_os_init(){
 
 void SystickHandler(void) {
   systick_counter ++;
+  os_sched();
 }
 
 

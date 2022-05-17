@@ -4,8 +4,9 @@
 #include <stdint.h>
 
 #define THREAD_STACK_SIZE 40
+#define MAX_NUM_THREADS 10
 
-#define DEBUG_STACK
+// #define DEBUG_STACK
 
 
 typedef void (*os_ThreadHandler)();
@@ -23,9 +24,19 @@ typedef struct {
 } os_Thread;
 
 
-void os_CreateThread(os_Thread *thread,
+
+
+
+
+void os_init();
+
+void os_createThread(os_Thread *thread,
                      os_ThreadHandler threadHandler
                      );
+
+void os_sched();
+
+void PendsvHandler(void);
 
 
 #endif

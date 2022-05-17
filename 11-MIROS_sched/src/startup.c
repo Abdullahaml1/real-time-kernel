@@ -56,6 +56,12 @@ static uint32_t pui32Stack[128]; // stack size is 128 word !
 //*****************************************************************************
 extern void SystickHandler(void);
 
+
+//*****************************************************************************
+// PendsvHandler
+//*****************************************************************************
+extern void PendsvHandler(void);
+
 //*****************************************************************************
 //
 // The vector table.  Note that the proper constructs must be placed on this to
@@ -80,8 +86,8 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // SVCall handler
     IntDefaultHandler,                      // Debug monitor handler
     0,                                      // Reserved
-    IntDefaultHandler,                      // The PendSV handler
-    SystickHandler,                          // The SysTick handler
+    PendsvHandler,                           // The PendSV handler
+    SystickHandler,                         // The SysTick handler
     IntDefaultHandler,                      // GPIO Port A
     IntDefaultHandler,                      // GPIO Port B
     IntDefaultHandler,                      // GPIO Port C

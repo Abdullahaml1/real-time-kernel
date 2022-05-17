@@ -1,4 +1,6 @@
 #include "miros.h"
+#include "tm4c123gh6pm.h"
+#include <stddef.h>
 
 /**
  * [Switching context Algorithm]
@@ -13,12 +15,43 @@
  pc=ourfunction Address, lr, r12, r3, r2 , r1, r0
  * 4-after the return form the ISR pc = pc form
  our stack which is the addresss of the function
+ * 5-when ISR hits again with the intention to
+ switch context save the current pc at the
+ thread's pc: currentThread -> pc = pc
+ * 6- the pc will equals to the next thread's pc
+ * pc = nextThread->pc
  */
 
 
-void os_CreateThread(os_Thread *thread,
+
+os_Thread *volatile os_threadPool[MAX_NUM_THREADS];
+
+os_Thread *volatile os_currentThread;
+os_Thread *volatile os_nextThread;
+
+
+uint32_t volatile i;
+uint8_t volatile os_switchContext;
+
+uint32_t os_threadCounter;
+
+
+void os_init() {
+  os_currentThread = NULL;
+  os_nextThread = NULL;
+
+  os_switchContext =0;
+  os_threadCounter =0;
+  i =0;
+}
+
+
+void os_createThread(os_Thread *thread,
                      os_ThreadHandler threadHandler
                      ) {
+  //---------------------------------------------
+  // creating Thread's stack
+  //---------------------------------------------
   // our stack grows form lower address to the
   // higher address
   os_StackElement *sp =
@@ -51,5 +84,62 @@ void os_CreateThread(os_Thread *thread,
   /* *(--sp) = 0x00000004U; /\* R4 *\/ */
 
   thread->sp = sp;
+
+
+  //---------------------------------------------
+  // Inserting tasks into the pool
+  //---------------------------------------------
+  os_threadPool[os_threadCounter] = thread;
+  os_threadCounter ++;
+
+}
+
+
+void os_sched(){
+  // chose which thread to run
+  os_nextThread = os_threadPool[i];
+  i= (i+1)%os_threadCounter;
+
+  if (os_currentThread != os_nextThread) {
+    os_switchContext =1;
+    //fires pendsv interrupt INTCTRL bit 28
+    NVIC_INT_CTRL_R |= 0x10000000;
+  }
+}
+
+void PendsvHandler(void) {
+  __asm volatile
+    (
+     "CPSID   I      \n " //disable interrupt
+
+     /* if (OS_curr != (os_currentThread *)0) */
+     "  LDR           r1,=os_currentThread  \n"
+     "  LDR           r1,[r1,#0x00]     \n"
+     "  CBZ           r1,next_thread \n"
+
+     // currentThread->sp = sp
+     "  LDR           r1,=os_currentThread  \n"
+     "  LDR           r1,[r1,#0x00]     \n"
+     "  STR           sp,[r1,#0x00]     \n"
+
+     "next_thread:                      \n"
+     // sp = nextThread->sp
+     "  LDR           r1,=os_nextThread  \n"
+     "  LDR           r1,[r1,#0x00]     \n"
+     "  LDR           sp,[r1,#0x00]     \n"
+
+
+     /* os_currentThread = os_nextThread ; */
+     "  LDR           r1,=os_nextThread \n"
+     "  LDR           r1,[r1,#0x00]     \n"
+     "  LDR           r2,=os_currentThread  \n"
+     "  STR           r1,[r2,#0x00]     \n"
+
+     "CPSIE   I      \n " //disable interrupt
+
+
+     /* return to the next thread */
+     "  BX            lr                \n"
+     );
 
 }
