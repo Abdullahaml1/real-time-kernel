@@ -5,7 +5,14 @@
 
 #define MEM_MAX_SIZE 16
 
+
+
+// default type is uint32_t
+#ifdef DYM_DATA_TYPE
+typedef DYM_DATA_TYPE dym_Type;
+#else
 typedef uint32_t dym_Type;
+#endif
 
 typedef struct dym_Node{
   dym_Type block;
