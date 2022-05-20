@@ -2,17 +2,14 @@
 #define DYNAMIC_MEMORY_H
 
 #include <stdint.h>
-
-#define MEM_MAX_SIZE 16
-
+#include "DynamicMemoryTypes.h" // for DYM_MEM_MAX_SIZE, DYM_DATA_TYPE
 
 
-// default type is uint32_t
-#ifdef DYM_DATA_TYPE
+
+
+
 typedef DYM_DATA_TYPE dym_Type;
-#else
-typedef uint32_t dym_Type;
-#endif
+
 
 typedef struct dym_Node{
   dym_Type block;
@@ -21,7 +18,7 @@ typedef struct dym_Node{
 
 typedef struct {
   dym_Node *head;
-  dym_Node mem[MEM_MAX_SIZE];
+  dym_Node mem[DYM_MEM_MAX_SIZE];
 } dym_List;
 
 

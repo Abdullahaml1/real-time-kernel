@@ -7,7 +7,7 @@ extern dym_List dym_list;
 void print_list()
 {
   uint32_t i=0;
-  for(i=0; i<MEM_MAX_SIZE;i++)
+  for(i=0; i<DYM_MEM_MAX_SIZE;i++)
     {
       printf("[%d]=%d, ", i, dym_list.mem[i].block);
     }

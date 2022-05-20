@@ -8,11 +8,11 @@ void dym_init() {
   dym_list.head = &dym_list.mem[0];
 
   uint32_t i=1;
-  for(i=0; i<MEM_MAX_SIZE-1; i++) {
+  for(i=0; i<DYM_MEM_MAX_SIZE-1; i++) {
     dym_list.mem[i].next = &dym_list.mem[i+1];
   }
 
-  dym_list.mem[MEM_MAX_SIZE-1].next=NULL;
+  dym_list.mem[DYM_MEM_MAX_SIZE-1].next=NULL;
 
 }
 
