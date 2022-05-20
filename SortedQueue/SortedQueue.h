@@ -4,6 +4,7 @@
 #include "DynamicMemory.h"
 #include "DynamicMemoryTypes.h"
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct sq_Queue {
   sq_Node *head;
