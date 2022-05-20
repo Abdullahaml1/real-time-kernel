@@ -2,24 +2,23 @@
 #include "DynamicMemory.h"
 #include <stddef.h>
 
-sq_Queue sq_queue;
 
-void sq_init(){
+void sq_init(sq_Queue *queue){
   // initializing dynamic memory allocation
   dym_init();
 
-  sq_queue.head = NULL;
-  sq_queue.len=0;
+  queue->head = NULL;
+  queue->len=0;
 }
 
 
-uint32_t sq_getSize() {
-  return sq_queue.len;
+uint32_t sq_getSize(sq_Queue *queue) {
+  return queue->len;
 }
 
 
 
-void sq_pushAndSort(sq_Type block, int32_t priority){
+void sq_pushAndSort(sq_Queue *queue, sq_Type block, int32_t priority){
 
   //allocating the new node
   sq_Node *new= dym_alloc();
@@ -32,19 +31,19 @@ void sq_pushAndSort(sq_Type block, int32_t priority){
 
 
   // incrementing len
-  sq_queue.len ++;
+  queue->len ++;
 
   // if queue is empty
-  if ((sq_queue.head == NULL)) {
+  if ((queue->head == NULL)) {
     // add the block
-    sq_queue.head = new;
+    queue->head = new;
     new->next = NULL;
   }
 
   //the queue is not empty
   else {
     //loop until you find current >prev, current < next
-    sq_Node *itr = sq_queue.head;
+    sq_Node *itr = queue->head;
     sq_Node *past = NULL;
     while(itr != NULL) {
 
@@ -64,8 +63,8 @@ void sq_pushAndSort(sq_Type block, int32_t priority){
     if (past == NULL) {
 
       //place at the top
-      new->next = sq_queue.head;
-      sq_queue.head =new;
+      new->next = queue->head;
+      queue->head =new;
     }
 
     else {
@@ -77,32 +76,32 @@ void sq_pushAndSort(sq_Type block, int32_t priority){
 }
 
 
-sq_Type sq_showFront(){
-  return sq_queue.head->block;
+sq_Type sq_showFront(sq_Queue *queue){
+  return queue->head->block;
 }
 
 
 
-sq_Type sq_popFront() {
+sq_Type sq_popFront(sq_Queue *queue) {
 
-  sq_Node *del = sq_queue.head;
+  sq_Node *del = queue->head;
   sq_Type block = del->block;
 
   //remove it
-  sq_queue.head = sq_queue.head->next;
+  queue->head = queue->head->next;
   dym_delete(del);
-  sq_queue.len --;
+  queue->len --;
 
   return block;
 }
 
 
-bool sq_isEmpty() {
-  return sq_queue.head == NULL;
+bool sq_isEmpty(sq_Queue *queue) {
+  return queue->head == NULL;
 }
 
 
-bool sq_isFull() {
-  return sq_queue.len == DYM_MEM_MAX_SIZE;
+bool sq_isFull(sq_Queue *queue ) {
+  return queue->len == DYM_MEM_MAX_SIZE;
 }
 
