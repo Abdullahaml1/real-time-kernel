@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8.2)
-project(MIROS_ThreadYield2)
+project(MIROS_ErliestDeadLineFirst)
 
 #Toolchain file
 include(tm4c123g.cmake)
