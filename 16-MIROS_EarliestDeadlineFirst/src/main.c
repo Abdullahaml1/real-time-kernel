@@ -10,6 +10,8 @@
 #include "driverlib/interrupt.h"
 
 
+// definition the struct that will handle the the thread's variables
+// and stack for blinkRred thread
 os_Thread blinkRedThread;
 void blinkRed();
 
@@ -20,6 +22,9 @@ os_Thread blinkBlueThread;
 void blinkBlue();
 
 
+// the function that will execute while there are not
+// threads to run
+void os_idleThreadHandler();
 
 int main(void)
 {
@@ -27,9 +32,11 @@ int main(void)
   bsp_os_init();
   os_init();
 
+  //Initializing the thread with:
   os_createThreadPeriodic(&blinkRedThread,
-                          &blinkRed,
-                          200);
+                          &blinkRed, // the thread's handler
+                          200); // the rate at which the thread will run
+                                // with respect to the systick counter
 
   os_createThreadPeriodic(&blinkGreenThread,
                           &blinkGreen,
@@ -40,6 +47,8 @@ int main(void)
                           50);
 
   UARTprintf("starting ->>\n");
+
+  // Starting the OS IE: Enabling Interrupt
   bsp_os_start();
 
   while(1)

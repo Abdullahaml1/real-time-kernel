@@ -59,30 +59,34 @@ void os_tick();
 
 /*
  * [schedles the threads as earliest deadline first algorithm. If the thread
- *  called os_threadYield or the deadline comes it will swthch context to the
+ *  called os_threadYield ((or the deadline comes)) <- TODO it will swthch context to the
  *  thread having least deadlineConter IE: front of os_serviceQueue (which is a
  *  sorted queue)]
  * */
 void os_sched();
 
 /**
- * [Switching context Algorithm]
+
+ * [Switching context Algorithm] self explained at
+ * the PendsvHanlder code
  * 1-when interrupts happens MCU pushes 8 regs in
  * the stack: xpsr, pc, lr, r12, r3, r2 , r1, r0
  * 2-aftet the ISR returns is pops them back ie:
  * pc = pc saved from stack
  * ** to switch context: **
+ * 3+-push {r4: r11} to the sp (IE: the current
+ * thread's registers)
  * 3-Inside the ISR Handler we changes pc to the
  * our stack like struct: sp = ourStacksSp with
  * the 8 location prefailed with xpsr,
  pc=ourfunction Address, lr, r12, r3, r2 , r1, r0
- * 3+-push
  * 4-after the return form the ISR pc = pc form
  our stack which is the addresss of the function
  * 5-when ISR hits again with the intention to
  switch context save the current pc at the
  thread's pc: currentThread -> pc = pc
  * 6- the pc will equals to the next thread's pc
+ * 6*- pop regs {r4:r11} from the next thread's pc
  * pc = nextThread->pc
  */
 void PendsvHandler(void);
