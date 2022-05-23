@@ -38,17 +38,26 @@ extern void os_idleThreadHandler();
 //------------------------------------------------
 // for Scheduler
 //------------------------------------------------
+// the array that will hold all threads created by the user
 os_Thread *volatile os_threadPool[MAX_NUM_THREADS];
-sq_Queue os_serviceQueue; // the queue to handle EarliestDeadlineFirst algorithm
 
+// the sorted queue to handle EarliestDeadlineFirst algorithm
+// that sorts threads with rescpect to their deadlineCounter
+// ascendingly
+sq_Queue os_serviceQueue; 
+
+// holds a pointer to the current thread holds CPU struct
 os_Thread *volatile os_currentThread;
+
+// holds a pointer to the next thread struct.
 os_Thread *volatile os_nextThread;
 
-uint8_t volatile os_switchContext;
-uint32_t os_threadCounter;
+// 1 if the current thread called `os_threadYield()`, 0 otherwise
 uint8_t os_yield;
 
 
+uint8_t volatile os_switchContext;
+uint32_t os_threadCounter;
 
 void os_init() {
   //initializing os_idleThread
@@ -310,6 +319,7 @@ void PendsvHandler(void) {
 void os_threadYield(os_Thread *thread) {
   IntMasterDisable();
 
+  // seting this flag to get the currnt thread out of the os_serviceQueue
   os_yield=1;
   os_sched();
 

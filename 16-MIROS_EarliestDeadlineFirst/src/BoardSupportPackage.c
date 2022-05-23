@@ -140,12 +140,22 @@ void bsp_os_start() {
 
 
 void SystickHandler(void) {
+  // disabling interrupt 
   IntMasterDisable();
 
   systick_counter ++;
+
+
+  // decrement thread->deadlineCouner for all threads and.
+  // puhes new threads to the os_servieQueue
   os_tick();
+
+
+  // reomoves the current thread that called os_threadYield.
+  //and gets the next thread to run form the foint of the Ascednding order
   os_sched();
 
+  // enabling interrupt 
   IntMasterEnable();
 }
 
