@@ -66,14 +66,17 @@ int main( void )
   GPIO_PORTF_DEN_R  = 0x0EU;
   GPIO_PORTF_DATA_R  = 0x08U; // write led
 
+  //-----------------------------------------------------------------------
+  // this was big wrong FREERTOS himslef hndles the initialization
+  //-----------------------------------------------------------------------
   // Enable interrupts to the processor.
-  IntMasterEnable();
+  /* IntMasterEnable(); */
 
    // Enable the SysTick Interrupt.
-   SysTickIntEnable();
+   /* SysTickIntEnable(); */
 
    // Enable SysTick.
-   SysTickEnable();
+   /* SysTickEnable(); */
 
 
 
@@ -97,6 +100,7 @@ int main( void )
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
+uint32_t SystemCoreClock = 16000000; // for free rtos config
 
 void vTask1( void *pvParameters )
 {
