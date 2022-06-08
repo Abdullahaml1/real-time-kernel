@@ -34,20 +34,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "tm4c123gh6pm.h"
-#include "driverlib/interrupt.h" // rom tivawoare
 
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
 #include "task.h"
 
-/* Stellaris library includes. */
-/* #include "hw_types.h" */
-/* #include "hw_memmap.h" */
-/* #include "hw_sysctl.h" */
 
-/* Demo includes. */
-/* #include "basic_io.h" */ // replace it with baisc.h in freertos/comnon
+//---------------------------------------------------------------
+// defining the system clock too Free RTOS
+//---------------------------------------------------------------
+uint32_t SystemCoreClock = 16000000; // for free rtos config
 
 /* Used as a loop counter to create a very crude delay. */
 #define mainDELAY_LOOP_COUNT		( 0xfffff )
@@ -100,7 +97,6 @@ int main( void )
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
-uint32_t SystemCoreClock = 16000000; // for free rtos config
 
 void vTask1( void *pvParameters )
 {
