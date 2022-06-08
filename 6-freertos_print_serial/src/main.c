@@ -47,13 +47,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-/* Stellaris library includes. */
-/* #include "hw_types.h" */
-/* #include "hw_memmap.h" */
-/* #include "hw_sysctl.h" */
 
-/* Demo includes. */
-/* #include "basic_io.h" */ // replace it with baisc.h in freertos/comnon
+//---------------------------------------------------------------
+// defining the system clock too Free RTOS
+//---------------------------------------------------------------
+uint32_t SystemCoreClock = 16000000; // for free rtos config
 
 /* Used as a loop counter to create a very crude delay. */
 #define mainDELAY_LOOP_COUNT		( 0xfffff )
@@ -61,6 +59,12 @@
 /* The task functions. */
 void vTask1( void *pvParameters );
 void vTask2( void *pvParameters );
+
+
+
+// initializing UART 
+void InitConsole(void);
+
 
 /*-----------------------------------------------------------*/
 
@@ -82,15 +86,6 @@ int main( void )
   GPIO_PORTF_DIR_R  = 0x0EU; // direction to output
   GPIO_PORTF_DEN_R  = 0x0EU;
   GPIO_PORTF_DATA_R  = 0x08U; // write led
-
-  // Enable interrupts to the processor.
-  IntMasterEnable();
-
-   // Enable the SysTick Interrupt.
-   SysTickIntEnable();
-
-   // Enable SysTick.
-   SysTickEnable();
 
 
 
@@ -117,7 +112,7 @@ int main( void )
 
 void vTask1( void *pvParameters )
 {
-const char *pcTaskName = "Task 1 is running\n";
+const char *pcTaskName = "Task1\n";
 volatile unsigned long ul;
 volatile unsigned long u2;
 
@@ -148,7 +143,7 @@ volatile unsigned long u2;
 
 void vTask2( void *pvParameters )
 {
-const char *pcTaskName = "Task 2 is running\n";
+const char *pcTaskName = "Task2\n";
 volatile unsigned long ul2;
 volatile unsigned long u22;
 
